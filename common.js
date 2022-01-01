@@ -34,3 +34,14 @@ function matrixToString(mat, fn) {
                 prev + fn(value), '') + '\n', 
         '');
 }
+
+function indicesToString(i, j) {
+    return `${i},${j}`;
+}
+
+function areIndicesValid(mat, i, j) {
+    return i >= 0 &&
+        j >= 0 &&
+        i < mat.length &&
+        j < mat[0].length;
+}
