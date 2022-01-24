@@ -45,3 +45,7 @@ function areIndicesValid(mat, i, j) {
         i < mat.length &&
         j < mat[0].length;
 }
+
+function isInteger(num) {
+    return num === Math.round(num);
+}
