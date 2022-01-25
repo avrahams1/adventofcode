@@ -1,6 +1,25 @@
 class Tree {
-    constructor() {
-        this.head = new TreeNode();
+    constructor(head) {
+        this.head = head;
+        this.calcDepths();
+    }
+
+    // calcDepths(node) {
+    //     if (node instanceof ValueNode) {
+    //         return 0;
+    //     }
+
+    //     return (node.depth = Math.max(this.calcDepths(node.right), this.calcDepths(node.left)) + 1);
+    // }
+    calcDepths(node = this.head, depth = 1) {
+        if (node instanceof ValueNode) {
+            return;
+        }
+
+        node.depth = depth;
+
+        this.calcDepths(node.left, depth + 1);
+        this.calcDepths(node.right, depth + 1);
     }
 }
 
@@ -10,38 +29,40 @@ class TreeNode {
         this.depth = 0;
     }
 
+    get isInnerNode() {
+        return true;
+    }
+
     get right() {
-        return this.right;
+        return this._right;
     }
 
     set right(val) {
-        this.right = val;
-        setParentIfNeeded(this.right);
+        this._right = val;
+        this.setParentIfNeeded(this.right, false);
     }
 
     get left() {
-        return this.left;
+        return this._left;
     }
 
     set left(val) {
-        this.left = val;
-        setParentIfNeeded(this.right);
+        this._left = val;
+        this.setParentIfNeeded(this.left, true);
     }
 
-    setParentIfNeeded(node) {
-        if (node instanceof TreeNode) {
-            node.parent = this;
-        }
-
-        let updatedDepth = 1;
-        for (let currNode = this; currNode !== null; currNode = currNode.parent) {
-            currNode.depth = updatedDepth++;
-        }
+    setParentIfNeeded(node, isLeft) {
+        node.parent = this;
+        node.isLeft = isLeft;
     }
 }
 
 class ValueNode {
     constructor(value) {
         this.value = value;
+    }
+
+    get isInnerNode() {
+        return false;
     }
 }
