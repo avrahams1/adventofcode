@@ -22,23 +22,30 @@ const input = (() => {
     }
 
     function parseNode(node, line) {
-        const firstCommaIndex = line.indexOf(',');
-        node.left = parseNodePart(line.substring(0, firstCommaIndex));
-        node.right = parseNodePart(line.substring(firstCommaIndex + 1));
-    }
+        const numMatch = part.match(/^(?<num>\d+)/);
 
-    function parseNodePart(part) {
-        if (part.charAt(0) === '[') {
-            return parseNode(new TreeNode(), part.substring(1));
-        } else {
-            const match = part.match(/^(?<num>\d+)/);
-            if (match === null) {
-                throw new Error('nooooo');
-            }
-
-            return new ValueNode(+match.groups('num'));
+        if (numMatch) {
+            const { num } = match.groups;
+            node.left = new ValueNode(+num);
         }
+        
+        // const firstCommaIndex = line.indexOf(',');
+        // node.left = parseNodePart(line.substring(0, firstCommaIndex));
+        // node.right = parseNodePart(line.substring(firstCommaIndex + 1));
     }
+
+    // function parseNodePart(part) {
+    //     if (part.charAt(0) === '[') {
+    //         return parseNode(new TreeNode(), part.substring(1));
+    //     } else {
+    //         const match = part.match(/^(?<num>\d+)/);
+    //         if (match === null) {
+    //             throw new Error('nooooo');
+    //         }
+
+    //         return new ValueNode(+match.groups('num'));
+    //     }
+    // }
 
     return values;
 })();
