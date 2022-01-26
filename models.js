@@ -6,6 +6,10 @@ class Tree {
     toString() {
         return this.head.toString();
     }
+
+    clone() {
+        return new Tree(this.head.clone());
+    }
 }
 
 class Node {
@@ -58,6 +62,14 @@ class TreeNode extends Node {
     toString() {
         return `[${this.left.toString()},${this.right.toString()}]`;
     }
+
+    clone() {
+        const newNode = new TreeNode();
+        newNode.right = this.right.clone();
+        newNode.left = this.left.clone();
+
+        return newNode;
+    }
 }
 
 class ValueNode extends Node {
@@ -68,5 +80,9 @@ class ValueNode extends Node {
 
     toString() {
         return this.value.toString();
+    }
+
+    clone() {
+        return new ValueNode(this.value);
     }
 }

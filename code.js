@@ -1,13 +1,13 @@
-rawInput = `[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]
-[[[5,[2,8]],4],[5,[[9,9],0]]]
-[6,[[[6,2],[5,6]],[[7,6],[4,7]]]]
-[[[6,[0,7]],[0,9]],[4,[9,[9,0]]]]
-[[[7,[6,4]],[3,[1,3]]],[[[5,5],1],9]]
-[[6,[[7,3],[3,2]]],[[[3,8],[5,7]],4]]
-[[[[5,4],[7,7]],8],[[8,3],8]]
-[[9,3],[[9,9],[6,[4,9]]]]
-[[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]
-[[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]`;
+// rawInput = `[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]
+// [[[5,[2,8]],4],[5,[[9,9],0]]]
+// [6,[[[6,2],[5,6]],[[7,6],[4,7]]]]
+// [[[6,[0,7]],[0,9]],[4,[9,[9,0]]]]
+// [[[7,[6,4]],[3,[1,3]]],[[[5,5],1],9]]
+// [[6,[[7,3],[3,2]]],[[[3,8],[5,7]],4]]
+// [[[[5,4],[7,7]],8],[[8,3],8]]
+// [[9,3],[[9,9],[6,[4,9]]]]
+// [[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]
+// [[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]`;
 
 const input = (() => {
     const values = rawInput
@@ -63,8 +63,8 @@ const input = (() => {
 
 function add(tree1, tree2) {
     const newHead = new TreeNode();
-    newHead.left = tree1.head;
-    newHead.right = tree2.head;
+    newHead.left = tree1.clone().head;
+    newHead.right = tree2.clone().head;
     const res = new Tree(newHead);
 
     logTree('added %s and %s and got %s', tree1, tree2, res);
@@ -193,12 +193,27 @@ function logTree(str, ...trees) {
     // console.log(str, ...trees.map(tree => tree.toString()));
 }
 
-let finalTree = input[0];
-for (let i = 1; i < input.length; i++) {
-    finalTree = add(finalTree, input[i]);
-    reduce(finalTree);
-    // console.log('#%d: %s', i, finalTree.toString());
-}
+// let finalTree = input[0];
+// for (let i = 1; i < input.length; i++) {
+//     finalTree = add(finalTree, input[i]);
+//     reduce(finalTree);
+// }
 
 // console.log(finalTree.toString());
-console.log(magnitude(finalTree));
+
+// console.log(magnitude(finalTree));
+
+let currMax = Number.MIN_VALUE;
+for (let i = 0; i < input.length; i++) {
+    for (let j = 0; j < input.length; j++) {
+        if (i === j) continue;
+
+        const resultTree = add(input[i], input[j]);
+        reduce(resultTree);
+        const treeMagnitue = magnitude(resultTree);
+
+        currMax = Math.max(currMax, treeMagnitue);
+    }
+}
+
+console.log(currMax);
