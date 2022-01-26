@@ -9,15 +9,12 @@ rawInput = `[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]
 [[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]
 [[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]`;
 
-// rawInput = '[[8,7],[6,[5,[4,[3,2]]]]]';
-// rawInput = '[[6,[5,[4,[3,2]]]],1]';
-
 const input = (() => {
     const values = rawInput
         .trim()
         .split('\n')
         .map(parseLine);
-    
+
     function parseLine(line) {
         return new Tree(parseNode(new TreeNode(), line).node);
     }
@@ -44,7 +41,7 @@ const input = (() => {
             const { num } = numMatch.groups;
 
             return {
-                node:  new ValueNode(+num),
+                node: new ValueNode(+num),
                 line: line.substring(num.length + 1)
             };
         } else if (line.charAt(0) === '[') {
@@ -68,53 +65,52 @@ function add(tree1, tree2) {
     const newHead = new TreeNode();
     newHead.left = tree1.head;
     newHead.right = tree2.head;
-    return new Tree(newHead);
+    const res = new Tree(newHead);
+
+    logTree('added %s and %s and got %s', tree1, tree2, res);
+
+    return res;
 }
 
 function reduce(tree) {
-    let didDoAnything;
-
-    do {
-        didDoAnything = explode(tree) || split(tree);
-        tree.calcDepths();
-    } while (didDoAnything);
+    while (explode(tree) || split(tree)) { }
 }
 
 function explode(tree) {
-    function findExplodablePair(node) {
+    function findExplodablePair(node, depth = 1) {
         if (!node.isInnerNode) {
             return null;
         }
 
-        if (node.depth >= 4 &&
+        if (depth >= 5 &&
             !node.right.isInnerNode &&
             !node.left.isInnerNode) {
-                return node;
-            }
-        
-        return findExplodablePair(node.left) || findExplodablePair(node.right);
+            return node;
+        }
+
+        return findExplodablePair(node.left, depth + 1) || findExplodablePair(node.right, depth + 1);
     }
 
     function getNodeToTheRight(node) {
-        for (; node.parent && node.isRight; node = node.parent) {}
-        
+        for (; node.parent && node.isRight; node = node.parent) { }
+
         if (!node.parent) {
             return null;
         }
 
-        for (node = node.parent.right; node.isInnerNode; node = node.left) {}
+        for (node = node.parent.right; node.isInnerNode; node = node.left) { }
 
         return node;
     }
 
     function getNodeToTheLeft(node) {
-        for (; node.parent && !node.isRight; node = node.parent) {}
-        
+        for (; node.parent && node.isLeft; node = node.parent) { }
+
         if (!node.parent) {
             return null;
         }
 
-        for (node = node.parent.left; node.isInnerNode; node = node.right) {}
+        for (node = node.parent.left; node.isInnerNode; node = node.right) { }
 
         return node;
     }
@@ -122,12 +118,14 @@ function explode(tree) {
     const explodableNode = findExplodablePair(tree.head);
 
     if (explodableNode) {
+        logTree('before explode: %s, exploding on %s', tree, explodableNode);
+
         const immidiateRight = getNodeToTheRight(explodableNode);
         const immidiateLeft = getNodeToTheLeft(explodableNode);
 
         // Update left and right
         if (immidiateLeft) {
-            immidiateLeft.values += explodableNode.left.value;
+            immidiateLeft.value += explodableNode.left.value;
         }
 
         if (immidiateRight) {
@@ -137,10 +135,12 @@ function explode(tree) {
         // Switch current node with a 0 constant
         const newNode = new ValueNode(0);
         if (explodableNode.isRight) {
-            explodableNode.right = newNode;
+            explodableNode.parent.right = newNode;
         } else {
-            explodableNode.left = newNode;
+            explodableNode.parent.left = newNode;
         }
+
+        logTree('exploded: %s', tree);
     }
 
     return !!explodableNode;
@@ -151,13 +151,15 @@ function split(tree) {
         if (!node.isInnerNode) {
             return node.value >= 10 ? node : null;
         }
-        
+
         return findSplittableNode(node.left) || findSplittableNode(node.right);
     }
 
     const splittableNode = findSplittableNode(tree.head);
 
     if (splittableNode) {
+        logTree('before split: %s, splitting on %s', tree, splittableNode);
+
         const { value, parent } = splittableNode;
         const newNode = new TreeNode();
         newNode.left = new ValueNode(Math.floor(value / 2));
@@ -168,15 +170,35 @@ function split(tree) {
         } else {
             parent.left = newNode;
         }
+
+        logTree('splitted: %s', tree);
     }
 
     return !!splittableNode;
+}
+
+function magnitude(tree) {
+    function value(node) {
+        if (!node.isInnerNode) {
+            return node.value;
+        }
+
+        return (3 * value(node.left)) + (2 * value(node.right));
+    }
+
+    return value(tree.head);
+}
+
+function logTree(str, ...trees) {
+    // console.log(str, ...trees.map(tree => tree.toString()));
 }
 
 let finalTree = input[0];
 for (let i = 1; i < input.length; i++) {
     finalTree = add(finalTree, input[i]);
     reduce(finalTree);
+    // console.log('#%d: %s', i, finalTree.toString());
 }
 
-console.log(finalTree);
+// console.log(finalTree.toString());
+console.log(magnitude(finalTree));

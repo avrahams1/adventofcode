@@ -1,36 +1,35 @@
 class Tree {
     constructor(head) {
         this.head = head;
-        this.calcDepths();
     }
 
-    // calcDepths(node) {
-    //     if (node instanceof ValueNode) {
-    //         return 0;
-    //     }
-
-    //     return (node.depth = Math.max(this.calcDepths(node.right), this.calcDepths(node.left)) + 1);
-    // }
-    calcDepths(node = this.head, depth = 1) {
-        if (node instanceof ValueNode) {
-            return;
-        }
-
-        node.depth = depth;
-
-        this.calcDepths(node.left, depth + 1);
-        this.calcDepths(node.right, depth + 1);
+    toString() {
+        return this.head.toString();
     }
 }
 
-class TreeNode {
-    constructor() {
-        this.parent = null;
-        this.depth = 0;
+class Node {
+    set isLeft(val) {
+        this._isLeft = val;
     }
 
-    get isInnerNode() {
-        return true;
+    get isLeft() {
+        return this._isLeft;
+    }
+
+    get isRight() {
+        return !this.isLeft;
+    }
+
+    get isInnerNode()  {
+        return this instanceof TreeNode;
+    }
+}
+
+class TreeNode extends Node {
+    constructor() {
+        super();
+        this.parent = null;
     }
 
     get right() {
@@ -55,14 +54,19 @@ class TreeNode {
         node.parent = this;
         node.isLeft = isLeft;
     }
+    
+    toString() {
+        return `[${this.left.toString()},${this.right.toString()}]`;
+    }
 }
 
-class ValueNode {
+class ValueNode extends Node {
     constructor(value) {
+        super();
         this.value = value;
     }
 
-    get isInnerNode() {
-        return false;
+    toString() {
+        return this.value.toString();
     }
 }
